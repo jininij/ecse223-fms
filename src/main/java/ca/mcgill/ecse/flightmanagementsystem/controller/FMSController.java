@@ -40,8 +40,28 @@ public class FMSController {
 	}
 	
 	public static String createAirport(String code, String address) {
-		//TODO
-		return "Not implemented!!";
+		if (code == null || code.equals("")) {
+			return "Error: airport code must not be empty";
+		}
+		if (address == null || address.equals("")) {
+			return "Error: airport address must not be empty";
+		}
+		
+		// try to get an airport with the same code
+		// for my creation to be valid, i need this to return null
+		Airport a = Airport.getWithCode(code);
+		
+		if (a!= null) {
+			return "Error: Airport already exists.";
+		}
+		
+		try {
+			fms.addAirport(address, code);
+			return ""; // no error
+		} catch(Exception e) {
+			return "Error: something went wrong";
+		}
+		
 	}
 	
 	
