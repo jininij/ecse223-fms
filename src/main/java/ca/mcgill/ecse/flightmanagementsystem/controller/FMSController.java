@@ -10,6 +10,7 @@ public class FMSController {
 
 	//1. Instance of FMS object
 	private static FMS fms = FMSApplication.getFMS();
+	// hello world
 	
 	//2. Controller methods (static)
 		// 2.1 get objects from model
