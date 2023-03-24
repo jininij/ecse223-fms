@@ -1,0 +1,85 @@
+class Flight {
+
+    Status {
+        NotReady {
+            assignPlane(Plane plane)[canBeAssigned(plane)]/ {
+                doAssignPlane(plane);
+            }-> Ready;
+            
+            assignPlane(Plane plane)[!canBeAssigned(plane)]/ {
+                rejectPlaneAssignment();
+            }-> NotReady;
+            
+            fly()/ {
+            	rejectFly("");
+            }-> NotReady;
+            
+	        cancel()/ {
+	        	doCancel();
+	        }-> Cancelled;
+        }
+        
+        Ready {
+        	unassign(Plane plane)[planeAssignedHere(plane)]/ {
+	        }-> NotReady;
+	        
+	        fly()[isTimeToFly()]/ {}-> Flying;
+	        
+	        fly()[!isTimeToFly()]/ {
+	        	rejectFly("");
+	        }-> Ready;
+	        
+	        cancel()/ {
+	        	doCancel();
+	        }-> Cancelled;
+	    }
+        
+        Flying {
+	        cancel()/ {
+	        	rejectCancel("");
+	        }-> Flying;
+	        
+	        land() -> Landed;
+        }
+        
+        Landed {
+	        cancel()/ {
+	        	rejectCancel("");
+	        }-> Landed;        
+	    }
+        
+        Cancelled {
+	        cancel() -> Cancelled;
+        }
+    }
+
+    private boolean canBeAssigned(Plane plane) {
+        return !plane.hasNextFlight();
+    }
+    
+	private boolean planeAssignedHere(Plane plane) {
+		return getPlane().getNextFlight().equals(this);
+	}
+	
+    private void doAssignPlane(Plane plane) {
+    	setPlane(plane);
+    }
+    
+    private void rejectPlaneAssignment() {
+    	 throw new RuntimeException("Cannot assign this plane to this flight.");
+    }
+    private boolean isTimeToFly() {
+    	java.util.Date d = new java.util.Date();    
+		return d.equals(date);
+    }
+    private void rejectFly(String error) {
+    	throw new RuntimeException(error);
+    }
+
+    private void doCancel() {
+    	setPlane(null);
+    }
+    private void rejectCancel(String error) {
+		throw new RuntimeException(error);    
+    }
+}

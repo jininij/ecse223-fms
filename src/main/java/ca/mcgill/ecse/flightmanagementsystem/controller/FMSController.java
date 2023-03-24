@@ -1,5 +1,7 @@
 package ca.mcgill.ecse.flightmanagementsystem.controller;
 
+import java.sql.Date;
+
 import ca.mcgill.ecse.flightmanagementsystem.application.FMSApplication;
 import ca.mcgill.ecse.flightmanagementsystem.model.Airport;
 import ca.mcgill.ecse.flightmanagementsystem.model.FMS;
@@ -65,7 +67,7 @@ public class FMSController {
 	}
 	
 	
-	public static String createFlight(String fromAirport, String toAirport, String flightNumber) {
+	public static String createFlight(String fromAirport, Date date, String toAirport, String flightNumber) {
 		if (fromAirport == null || toAirport == null) {
 			return "Error: invalid argument";
 		}
@@ -86,7 +88,7 @@ public class FMSController {
 		}
 		
 		try {
-			fms.addFlight(flightNumber, fAirport, tAirport);
+			fms.addFlight(flightNumber, date, fAirport, tAirport);
 			return "";
 		} catch(Exception e) {
 			return "Something went wrong";

@@ -3,7 +3,7 @@
 
 package ca.mcgill.ecse.flightmanagementsystem.model;
 
-// line 23 "../../../../../flightmanagementsystem.ump"
+// line 26 "../../../../../FlightManagementSystem.ump"
 public class Plane
 {
 
@@ -32,7 +32,7 @@ public class Plane
   // CONSTRUCTOR
   //------------------------
 
-  public Plane(String aModel, String aStatus, FMS aFMS, Flight aNextFlight)
+  public Plane(String aModel, String aStatus, FMS aFMS)
   {
     model = aModel;
     status = aStatus;
@@ -41,11 +41,6 @@ public class Plane
     if (!didAddFMS)
     {
       throw new RuntimeException("Unable to create plane due to fMS. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
-    }
-    boolean didAddNextFlight = setNextFlight(aNextFlight);
-    if (!didAddNextFlight)
-    {
-      throw new RuntimeException("Unable to create plane due to nextFlight. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
     }
   }
 
@@ -93,6 +88,12 @@ public class Plane
   {
     return nextFlight;
   }
+
+  public boolean hasNextFlight()
+  {
+    boolean has = nextFlight != null;
+    return has;
+  }
   /* Code from template association_SetOneToMany */
   public boolean setFMS(FMS aFMS)
   {
@@ -112,30 +113,35 @@ public class Plane
     wasSet = true;
     return wasSet;
   }
-  /* Code from template association_SetOneToOptionalOne */
+  /* Code from template association_SetOptionalOneToOptionalOne */
   public boolean setNextFlight(Flight aNewNextFlight)
   {
     boolean wasSet = false;
     if (aNewNextFlight == null)
     {
-      //Unable to setNextFlight to null, as plane must always be associated to a nextFlight
+      Flight existingNextFlight = nextFlight;
+      nextFlight = null;
+      
+      if (existingNextFlight != null && existingNextFlight.getPlane() != null)
+      {
+        existingNextFlight.setPlane(null);
+      }
+      wasSet = true;
       return wasSet;
     }
-    
-    Plane existingPlane = aNewNextFlight.getPlane();
-    if (existingPlane != null && !equals(existingPlane))
-    {
-      //Unable to setNextFlight, the current nextFlight already has a plane, which would be orphaned if it were re-assigned
-      return wasSet;
-    }
-    
-    Flight anOldNextFlight = nextFlight;
-    nextFlight = aNewNextFlight;
-    nextFlight.setPlane(this);
 
-    if (anOldNextFlight != null)
+    Flight currentNextFlight = getNextFlight();
+    if (currentNextFlight != null && !currentNextFlight.equals(aNewNextFlight))
     {
-      anOldNextFlight.setPlane(null);
+      currentNextFlight.setPlane(null);
+    }
+
+    nextFlight = aNewNextFlight;
+    Plane existingPlane = aNewNextFlight.getPlane();
+
+    if (!equals(existingPlane))
+    {
+      aNewNextFlight.setPlane(this);
     }
     wasSet = true;
     return wasSet;
@@ -149,11 +155,9 @@ public class Plane
     {
       placeholderFMS.removePlane(this);
     }
-    Flight existingNextFlight = nextFlight;
-    nextFlight = null;
-    if (existingNextFlight != null)
+    if (nextFlight != null)
     {
-      existingNextFlight.setPlane(null);
+      nextFlight.setPlane(null);
     }
   }
 

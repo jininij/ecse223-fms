@@ -4,7 +4,7 @@
 package ca.mcgill.ecse.flightmanagementsystem.model;
 import java.util.*;
 
-// line 19 "../../../../../flightmanagementsystem.ump"
+// line 22 "../../../../../FlightManagementSystem.ump"
 public class Person
 {
 

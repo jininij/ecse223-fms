@@ -3,8 +3,10 @@
 
 package ca.mcgill.ecse.flightmanagementsystem.model;
 import java.util.*;
+import java.sql.Date;
 
-// line 10 "../../../../../flightmanagementsystem.ump"
+// line 1 "../../../../../FlightStates.ump"
+// line 12 "../../../../../FlightManagementSystem.ump"
 public class Flight
 {
 
@@ -20,6 +22,11 @@ public class Flight
 
   //Flight Attributes
   private String flightNumber;
+  private Date date;
+
+  //Flight State Machines
+  public enum Status { NotReady, Ready, Flying, Landed, Cancelled }
+  private Status status;
 
   //Flight Associations
   private FMS fMS;
@@ -33,8 +40,9 @@ public class Flight
   // CONSTRUCTOR
   //------------------------
 
-  public Flight(String aFlightNumber, FMS aFMS, Airport aFromAirport, Airport aToAirport)
+  public Flight(String aFlightNumber, Date aDate, FMS aFMS, Airport aFromAirport, Airport aToAirport)
   {
+    date = aDate;
     if (!setFlightNumber(aFlightNumber))
     {
       throw new RuntimeException("Cannot create due to duplicate flightNumber. See http://manual.umple.org?RE003ViolationofUniqueness.html");
@@ -55,6 +63,7 @@ public class Flight
       throw new RuntimeException("Unable to create arrivingFlight due to toAirport. See http://manual.umple.org?RE002ViolationofAssociationMultiplicity.html");
     }
     passengers = new ArrayList<Person>();
+    setStatus(Status.NotReady);
   }
 
   //------------------------
@@ -80,6 +89,14 @@ public class Flight
     return wasSet;
   }
 
+  public boolean setDate(Date aDate)
+  {
+    boolean wasSet = false;
+    date = aDate;
+    wasSet = true;
+    return wasSet;
+  }
+
   public String getFlightNumber()
   {
     return flightNumber;
@@ -93,6 +110,181 @@ public class Flight
   public static boolean hasWithFlightNumber(String aFlightNumber)
   {
     return getWithFlightNumber(aFlightNumber) != null;
+  }
+
+  public Date getDate()
+  {
+    return date;
+  }
+
+  public String getStatusFullName()
+  {
+    String answer = status.toString();
+    return answer;
+  }
+
+  public Status getStatus()
+  {
+    return status;
+  }
+
+  public boolean assignPlane(Plane plane)
+  {
+    boolean wasEventProcessed = false;
+    
+    Status aStatus = status;
+    switch (aStatus)
+    {
+      case NotReady:
+        if (canBeAssigned(plane))
+        {
+        // line 5 "../../../../../FlightStates.ump"
+          doAssignPlane(plane);
+          setStatus(Status.Ready);
+          wasEventProcessed = true;
+          break;
+        }
+        if (!(canBeAssigned(plane)))
+        {
+        // line 9 "../../../../../FlightStates.ump"
+          rejectPlaneAssignment();
+          setStatus(Status.NotReady);
+          wasEventProcessed = true;
+          break;
+        }
+        break;
+      default:
+        // Other states do respond to this event
+    }
+
+    return wasEventProcessed;
+  }
+
+  public boolean fly()
+  {
+    boolean wasEventProcessed = false;
+    
+    Status aStatus = status;
+    switch (aStatus)
+    {
+      case NotReady:
+        // line 13 "../../../../../FlightStates.ump"
+        rejectFly("");
+        setStatus(Status.NotReady);
+        wasEventProcessed = true;
+        break;
+      case Ready:
+        if (isTimeToFly())
+        {
+        // line 26 "../../../../../FlightStates.ump"
+          
+          setStatus(Status.Flying);
+          wasEventProcessed = true;
+          break;
+        }
+        if (!(isTimeToFly()))
+        {
+        // line 28 "../../../../../FlightStates.ump"
+          rejectFly("");
+          setStatus(Status.Ready);
+          wasEventProcessed = true;
+          break;
+        }
+        break;
+      default:
+        // Other states do respond to this event
+    }
+
+    return wasEventProcessed;
+  }
+
+  public boolean cancel()
+  {
+    boolean wasEventProcessed = false;
+    
+    Status aStatus = status;
+    switch (aStatus)
+    {
+      case NotReady:
+        // line 17 "../../../../../FlightStates.ump"
+        doCancel();
+        setStatus(Status.Cancelled);
+        wasEventProcessed = true;
+        break;
+      case Ready:
+        // line 32 "../../../../../FlightStates.ump"
+        doCancel();
+        setStatus(Status.Cancelled);
+        wasEventProcessed = true;
+        break;
+      case Flying:
+        // line 38 "../../../../../FlightStates.ump"
+        rejectCancel("");
+        setStatus(Status.Flying);
+        wasEventProcessed = true;
+        break;
+      case Landed:
+        // line 46 "../../../../../FlightStates.ump"
+        rejectCancel("");
+        setStatus(Status.Landed);
+        wasEventProcessed = true;
+        break;
+      case Cancelled:
+        setStatus(Status.Cancelled);
+        wasEventProcessed = true;
+        break;
+      default:
+        // Other states do respond to this event
+    }
+
+    return wasEventProcessed;
+  }
+
+  public boolean unassign(Plane plane)
+  {
+    boolean wasEventProcessed = false;
+    
+    Status aStatus = status;
+    switch (aStatus)
+    {
+      case Ready:
+        if (planeAssignedHere(plane))
+        {
+        // line 23 "../../../../../FlightStates.ump"
+          
+          setStatus(Status.NotReady);
+          wasEventProcessed = true;
+          break;
+        }
+        break;
+      default:
+        // Other states do respond to this event
+    }
+
+    return wasEventProcessed;
+  }
+
+  public boolean land()
+  {
+    boolean wasEventProcessed = false;
+    
+    Status aStatus = status;
+    switch (aStatus)
+    {
+      case Flying:
+        setStatus(Status.Landed);
+        wasEventProcessed = true;
+        break;
+      default:
+        // Other states do respond to this event
+    }
+
+    return wasEventProcessed;
+  }
+
+  private void setStatus(Status aStatus)
+  {
+    status = aStatus;
   }
   /* Code from template association_GetOne */
   public FMS getFMS()
@@ -218,29 +410,35 @@ public class Flight
     wasSet = true;
     return wasSet;
   }
-  /* Code from template association_SetOptionalOneToOne */
+  /* Code from template association_SetOptionalOneToOptionalOne */
   public boolean setPlane(Plane aNewPlane)
   {
     boolean wasSet = false;
-    if (plane != null && !plane.equals(aNewPlane) && equals(plane.getNextFlight()))
+    if (aNewPlane == null)
     {
-      //Unable to setPlane, as existing plane would become an orphan
+      Plane existingPlane = plane;
+      plane = null;
+      
+      if (existingPlane != null && existingPlane.getNextFlight() != null)
+      {
+        existingPlane.setNextFlight(null);
+      }
+      wasSet = true;
       return wasSet;
     }
 
-    plane = aNewPlane;
-    Flight anOldNextFlight = aNewPlane != null ? aNewPlane.getNextFlight() : null;
-
-    if (!this.equals(anOldNextFlight))
+    Plane currentPlane = getPlane();
+    if (currentPlane != null && !currentPlane.equals(aNewPlane))
     {
-      if (anOldNextFlight != null)
-      {
-        anOldNextFlight.plane = null;
-      }
-      if (plane != null)
-      {
-        plane.setNextFlight(this);
-      }
+      currentPlane.setNextFlight(null);
+    }
+
+    plane = aNewPlane;
+    Flight existingNextFlight = aNewPlane.getNextFlight();
+
+    if (!equals(existingNextFlight))
+    {
+      aNewPlane.setNextFlight(this);
     }
     wasSet = true;
     return wasSet;
@@ -371,11 +569,9 @@ public class Flight
     {
       placeholderToAirport.removeArrivingFlight(this);
     }
-    Plane existingPlane = plane;
-    plane = null;
-    if (existingPlane != null)
+    if (plane != null)
     {
-      existingPlane.delete();
+      plane.setNextFlight(null);
     }
     while( !passengers.isEmpty() )
     {
@@ -387,11 +583,53 @@ public class Flight
     }
   }
 
+  // line 57 "../../../../../FlightStates.ump"
+   private boolean canBeAssigned(Plane plane){
+    return !plane.hasNextFlight();
+  }
+
+  // line 61 "../../../../../FlightStates.ump"
+   private boolean planeAssignedHere(Plane plane){
+    return getPlane().getNextFlight().equals(this);
+  }
+
+  // line 65 "../../../../../FlightStates.ump"
+   private void doAssignPlane(Plane plane){
+    setPlane(plane);
+  }
+
+  // line 69 "../../../../../FlightStates.ump"
+   private void rejectPlaneAssignment(){
+    throw new RuntimeException("Cannot assign this plane to this flight.");
+  }
+
+  // line 72 "../../../../../FlightStates.ump"
+   private boolean isTimeToFly(){
+    java.util.Date d = new java.util.Date();    
+		return d.equals(date);
+  }
+
+  // line 76 "../../../../../FlightStates.ump"
+   private void rejectFly(String error){
+    throw new RuntimeException(error);
+  }
+
+  // line 80 "../../../../../FlightStates.ump"
+   private void doCancel(){
+    setPlane(null);
+  }
+
+  // line 83 "../../../../../FlightStates.ump"
+   private void rejectCancel(String error){
+    throw new RuntimeException(error);
+  }
+
 
   public String toString()
   {
     return super.toString() + "["+
             "flightNumber" + ":" + getFlightNumber()+ "]" + System.getProperties().getProperty("line.separator") +
+            "  " + "date" + "=" + (getDate() != null ? !getDate().equals(this)  ? getDate().toString().replaceAll("  ","    ") : "this" : "null") + System.getProperties().getProperty("line.separator") +
             "  " + "fMS = "+(getFMS()!=null?Integer.toHexString(System.identityHashCode(getFMS())):"null") + System.getProperties().getProperty("line.separator") +
             "  " + "fromAirport = "+(getFromAirport()!=null?Integer.toHexString(System.identityHashCode(getFromAirport())):"null") + System.getProperties().getProperty("line.separator") +
             "  " + "toAirport = "+(getToAirport()!=null?Integer.toHexString(System.identityHashCode(getToAirport())):"null") + System.getProperties().getProperty("line.separator") +

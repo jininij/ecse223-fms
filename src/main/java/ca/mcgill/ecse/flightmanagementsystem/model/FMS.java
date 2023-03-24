@@ -3,8 +3,9 @@
 
 package ca.mcgill.ecse.flightmanagementsystem.model;
 import java.util.*;
+import java.sql.Date;
 
-// line 3 "../../../../../flightmanagementsystem.ump"
+// line 5 "../../../../../FlightManagementSystem.ump"
 public class FMS
 {
 
@@ -159,9 +160,9 @@ public class FMS
     return 0;
   }
   /* Code from template association_AddManyToOne */
-  public Flight addFlight(String aFlightNumber, Airport aFromAirport, Airport aToAirport)
+  public Flight addFlight(String aFlightNumber, Date aDate, Airport aFromAirport, Airport aToAirport)
   {
-    return new Flight(aFlightNumber, this, aFromAirport, aToAirport);
+    return new Flight(aFlightNumber, aDate, this, aFromAirport, aToAirport);
   }
 
   public boolean addFlight(Flight aFlight)
@@ -375,9 +376,9 @@ public class FMS
     return 0;
   }
   /* Code from template association_AddManyToOne */
-  public Plane addPlane(String aModel, String aStatus, Flight aNextFlight)
+  public Plane addPlane(String aModel, String aStatus)
   {
-    return new Plane(aModel, aStatus, this, aNextFlight);
+    return new Plane(aModel, aStatus, this);
   }
 
   public boolean addPlane(Plane aPlane)

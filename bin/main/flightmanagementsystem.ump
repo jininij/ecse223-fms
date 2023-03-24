@@ -9,6 +9,7 @@ class FMS {
 
 class Flight {
 unique flightNumber;
+Date date;
 }
 
 class Airport {
