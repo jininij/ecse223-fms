@@ -22,7 +22,6 @@ public class Plane
 
   //Plane Attributes
   private String model;
-  private String status;
 
   //Autounique Attributes
   private int id;
@@ -35,10 +34,9 @@ public class Plane
   // CONSTRUCTOR
   //------------------------
 
-  public Plane(String aModel, String aStatus, FMS aFMS)
+  public Plane(String aModel, FMS aFMS)
   {
     model = aModel;
-    status = aStatus;
     id = nextId++;
     boolean didAddFMS = setFMS(aFMS);
     if (!didAddFMS)
@@ -59,22 +57,9 @@ public class Plane
     return wasSet;
   }
 
-  public boolean setStatus(String aStatus)
-  {
-    boolean wasSet = false;
-    status = aStatus;
-    wasSet = true;
-    return wasSet;
-  }
-
   public String getModel()
   {
     return model;
-  }
-
-  public String getStatus()
-  {
-    return status;
   }
 
   public int getId()
@@ -165,7 +150,7 @@ public class Plane
   }
 
   // line 39 "../../../../../FMSPersistence.ump"
-   public static void reinitializeAutouniqueID(List<Plane> planes){
+   public static  void reinitializeAutouniqueID(List<Plane> planes){
     nextId = 0; 
     for (Plane plane : planes) {
       if (plane.getId() > nextId) {
@@ -180,8 +165,7 @@ public class Plane
   {
     return super.toString() + "["+
             "id" + ":" + getId()+ "," +
-            "model" + ":" + getModel()+ "," +
-            "status" + ":" + getStatus()+ "]" + System.getProperties().getProperty("line.separator") +
+            "model" + ":" + getModel()+ "]" + System.getProperties().getProperty("line.separator") +
             "  " + "fMS = "+(getFMS()!=null?Integer.toHexString(System.identityHashCode(getFMS())):"null") + System.getProperties().getProperty("line.separator") +
             "  " + "nextFlight = "+(getNextFlight()!=null?Integer.toHexString(System.identityHashCode(getNextFlight())):"null");
   }

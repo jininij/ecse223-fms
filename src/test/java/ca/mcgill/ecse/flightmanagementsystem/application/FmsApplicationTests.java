@@ -14,7 +14,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
+import ca.mcgill.ecse.flightmanagementsystem.model.Airport;
 import ca.mcgill.ecse.flightmanagementsystem.model.FMS;
+import ca.mcgill.ecse.flightmanagementsystem.model.Flight;
 import ca.mcgill.ecse.flightmanagementsystem.model.Plane;
 import ca.mcgill.ecse.flightmanagementsystem.persistence.FmsPersistence;
 
@@ -22,15 +24,15 @@ public class FmsApplicationTests {
 
   private static FMS fms = FMSApplication.getFMS();
 
-  private static int nextDriverID = 1;
-  private static String filename = "testdata.btms";
+  private static int nextPlaneID = 1;
+  private static String filename = "testdata.fms";
 
   @BeforeAll
   public static void setUpOnce() {
     FmsPersistence.setFilename(filename);
     // This is a small trick to initialize nextDriverID variable before running the test suite
-    Plane dummyPlane = new Plane("b777", "available", new FMS());
-    nextDriverID = dummyPlane.getId() + 1;
+    Plane dummyPlane = new Plane("b777", new FMS());
+    nextPlaneID = dummyPlane.getId() + 1;
   }
 
   @BeforeEach
@@ -43,29 +45,62 @@ public class FmsApplicationTests {
 
   @Test
   public void testPersistence() {
-//    Date date = Date.valueOf(LocalDate.now());
-//    String licencePlate = "XYZ123";
-//    BusVehicle bus = fms.addVehicle(licencePlate);
-//    int routeNumber = 1;
-//    Route route = fms.addRoute(routeNumber);
-//    RouteAssignment assignment = fms.addAssignment(date, bus, route);
-//    String name = "driver";
-//    nextDriverID++;
-//    Driver driver = fms.addDriver(name);
-//    Shift shift = Shift.Afternoon;
-//    fms.addSchedule(shift, driver, assignment);
-//    BtmsPersistence.save();
-//
-//    // load model again and check it
-//    BTMS btms2 = BtmsPersistence.load();
-//    checkResultSchedule(driver.getName(), driver.getSickStatus(), driver.getId(), assignment.getDate(),
-//        assignment.getRoute().getNumber(), assignment.getBus().getLicencePlate(), assignment.getBus().getRepairStatus(),
-//        shift, btms2, 1, 1, 1, 1, 1);
+    Date date = Date.valueOf(LocalDate.now());
+    Airport a1 = fms.addAirport("montreal", "yul");
+    Airport a2 = fms.addAirport("toronto", "yyt");
+    Airport a3 = fms.addAirport("vancouver", "code");
+    Flight f1 = fms.addFlight("AC001", date, a1, a2);
+	FmsPersistence.save();
+
+	FMS fms2 = FmsPersistence.load();
+	assertEquals(fms2.getAirports().size(),3);
+	assertEquals(0, Airport.getWithCode("code").getArrivingFlights().size());
+	assertEquals(1, Airport.getWithCode("yul").getDepartingFlights().size());
+	assertEquals(0, Airport.getWithCode("yyt").getDepartingFlights().size());
+	assertEquals(0, Airport.getWithCode("yul").getArrivingFlights().size());
+	assertEquals(1, Airport.getWithCode("yyt").getArrivingFlights().size());
   }
 
   @Test
   public void testPersistenceReinitialization() {
-//    Date date = Date.valueOf(LocalDate.now());
+    Date date = Date.valueOf(LocalDate.now());
+    
+    int planeId = nextPlaneID++;
+    String planeModel1 = "a380";
+    Plane p1 = fms.addPlane(planeModel1);
+    
+    planeId = nextPlaneID++;
+    String planeModel2 = "b777";
+    Plane p2 = fms.addPlane(planeModel2);
+    
+    String ac1 = "yul";
+    String ac2 = "yyt";
+    Airport a1 = fms.addAirport("montreal", ac1);
+    Airport a2 = fms.addAirport("toronto", ac2);
+    Flight f1 = fms.addFlight("AC001", date, a1, a2);
+    
+    FmsPersistence.save();
+    
+    fms.delete();
+    assertTrue(fms.getPlanes().isEmpty());
+    
+    fms.reinitialize();
+    
+    assertEquals(0, fms.numberOfPlanes());
+    
+    fms = FmsPersistence.load();
+    assertEquals(2, fms.numberOfPlanes());
+    assertEquals(p1.getId(), fms.getPlane(0).getId());
+    assertEquals(p1.getModel(), fms.getPlane(0).getModel());
+    assertEquals(p2.getId(), fms.getPlane(1).getId());
+    assertEquals(p2.getModel(), fms.getPlane(1).getModel());
+    
+    assertEquals(2, fms.numberOfAirports());
+    assertEquals(ac1,fms.getFlight(0).getFromAirport().getCode());
+    assertFailure(() -> fms.addAirport("montreal", ac1), "Cannot create due to duplicate code");
+    assertFailure(() -> fms.addFlight("AC001",date, a2, a1), "Cannot create due to duplicate flightNumber.");
+
+    
 //    String licencePlate = "XYZ123";
 //    BusVehicle bus = fms.addVehicle(licencePlate);
 //    int routeNumber = 1;

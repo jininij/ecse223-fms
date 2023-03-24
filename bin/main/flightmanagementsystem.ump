@@ -1,5 +1,8 @@
 namespace ca.mcgill.ecse.flightmanagementsystem.model;
 
+use FlightStates.ump;
+use FMSPersistence.ump;
+
 class FMS {
 1 <@>- * Flight;
 1 <@>- * Person;
@@ -22,15 +25,14 @@ unique name;
 }
 
 class Plane {
-autounique planeId;
+autounique id;
 model;
-status;
 }
 
 association {
 1 Airport fromAirport -- * Flight departingFlights;
 1 Airport toAirport -- * Flight arrivingFlights;
-0..1 Plane plane -- 1 Flight nextFlight;
+0..1 Plane plane -- 0..1 Flight nextFlight;
 * Person passengers -- 0..1 Flight boardingFlight;
 0..1 Person pilot -- 0..1 Flight workingFlight;
 }

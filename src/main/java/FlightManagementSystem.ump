@@ -27,7 +27,6 @@ unique name;
 class Plane {
 autounique id;
 model;
-status;
 }
 
 association {

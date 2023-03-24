@@ -377,9 +377,9 @@ public class FMS
     return 0;
   }
   /* Code from template association_AddManyToOne */
-  public Plane addPlane(String aModel, String aStatus)
+  public Plane addPlane(String aModel)
   {
-    return new Plane(aModel, aStatus, this);
+    return new Plane(aModel, this);
   }
 
   public boolean addPlane(Plane aPlane)

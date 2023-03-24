@@ -7,6 +7,7 @@ import ca.mcgill.ecse.flightmanagementsystem.model.Airport;
 import ca.mcgill.ecse.flightmanagementsystem.model.FMS;
 import ca.mcgill.ecse.flightmanagementsystem.model.Flight;
 import ca.mcgill.ecse.flightmanagementsystem.model.Person;
+import ca.mcgill.ecse.flightmanagementsystem.persistence.FmsPersistence;
 
 public class FMSController {
 
@@ -33,6 +34,7 @@ public class FMSController {
 			// create the person
 			try {
 				fms.addPerson(name);
+				FmsPersistence.save();
 				return "";
 				
 			} catch(Exception e) {
@@ -59,6 +61,7 @@ public class FMSController {
 		
 		try {
 			fms.addAirport(address, code);
+			FmsPersistence.save();
 			return ""; // no error
 		} catch(Exception e) {
 			return "Error: something went wrong";
@@ -87,8 +90,13 @@ public class FMSController {
 			return "Error: flight number cannot be empty";
 		}
 		
+		Flight f = Flight.getWithFlightNumber(flightNumber);
+		if (f != null) {
+			return "Error: flight number already exists.";
+		}
 		try {
 			fms.addFlight(flightNumber, date, fAirport, tAirport);
+			FmsPersistence.save();
 			return "";
 		} catch(Exception e) {
 			return "Something went wrong";
@@ -118,6 +126,7 @@ public class FMSController {
 			Flight flight = Flight.getWithFlightNumber(flightNumber);
 			Person person = Person.getWithName(name);
 			flight.addPassenger(person);
+			FmsPersistence.save();
 			return "";
 		} catch(Exception e) {
 			return "Something went wrong";
