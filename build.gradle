@@ -24,8 +24,8 @@ javafx {
 }
 
 tasks.register('copyResources', Copy) {
-    from "src/main/java/ca/mcgill/ecse/snowshoetours"
-    into "build/classes/java/main/ca/mcgill/ecse/snowshoetours"
+    from "src/main/java/ca/mcgill/ecse/flightmanagementsystem"
+    into "build/classes/java/main/ca/mcgill/ecse/flightmanagementsystem"
     exclude "**/*.java"
 }
 tasks.named('run') {
