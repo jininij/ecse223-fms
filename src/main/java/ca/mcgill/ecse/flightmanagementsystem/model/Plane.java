@@ -3,7 +3,10 @@
 
 package ca.mcgill.ecse.flightmanagementsystem.model;
 
-// line 26 "../../../../../FlightManagementSystem.ump"
+import java.util.List;
+
+// line 37 "../../../../../FMSPersistence.ump"
+// line 27 "../../../../../FlightManagementSystem.ump"
 public class Plane
 {
 
@@ -11,7 +14,7 @@ public class Plane
   // STATIC VARIABLES
   //------------------------
 
-  private static int nextPlaneId = 1;
+  private static int nextId = 1;
 
   //------------------------
   // MEMBER VARIABLES
@@ -22,7 +25,7 @@ public class Plane
   private String status;
 
   //Autounique Attributes
-  private int planeId;
+  private int id;
 
   //Plane Associations
   private FMS fMS;
@@ -36,7 +39,7 @@ public class Plane
   {
     model = aModel;
     status = aStatus;
-    planeId = nextPlaneId++;
+    id = nextId++;
     boolean didAddFMS = setFMS(aFMS);
     if (!didAddFMS)
     {
@@ -74,9 +77,9 @@ public class Plane
     return status;
   }
 
-  public int getPlaneId()
+  public int getId()
   {
-    return planeId;
+    return id;
   }
   /* Code from template association_GetOne */
   public FMS getFMS()
@@ -161,11 +164,22 @@ public class Plane
     }
   }
 
+  // line 39 "../../../../../FMSPersistence.ump"
+   public static void reinitializeAutouniqueID(List<Plane> planes){
+    nextId = 0; 
+    for (Plane plane : planes) {
+      if (plane.getId() > nextId) {
+        nextId = plane.getId();
+      }
+    }
+    nextId++;
+  }
+
 
   public String toString()
   {
     return super.toString() + "["+
-            "planeId" + ":" + getPlaneId()+ "," +
+            "id" + ":" + getId()+ "," +
             "model" + ":" + getModel()+ "," +
             "status" + ":" + getStatus()+ "]" + System.getProperties().getProperty("line.separator") +
             "  " + "fMS = "+(getFMS()!=null?Integer.toHexString(System.identityHashCode(getFMS())):"null") + System.getProperties().getProperty("line.separator") +

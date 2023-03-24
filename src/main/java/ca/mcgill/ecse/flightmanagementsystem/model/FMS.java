@@ -5,7 +5,8 @@ package ca.mcgill.ecse.flightmanagementsystem.model;
 import java.util.*;
 import java.sql.Date;
 
-// line 5 "../../../../../FlightManagementSystem.ump"
+// line 1 "../../../../../FMSPersistence.ump"
+// line 6 "../../../../../FlightManagementSystem.ump"
 public class FMS
 {
 
@@ -473,6 +474,14 @@ public class FMS
       planes.remove(aPlane);
     }
     
+  }
+
+  // line 3 "../../../../../FMSPersistence.ump"
+   public void reinitialize(){
+    Flight.reinitializeUniqueFlightNumber(getFlights());
+    Airport.reinitializeUniqueCode(getAirports());
+    Plane.reinitializeAutouniqueID(getPlanes());
+    Person.reinitializeUniqueName(getPersons());
   }
 
 }

@@ -1,0 +1,47 @@
+class FMS {
+  public void reinitialize() {
+    Flight.reinitializeUniqueFlightNumber(getFlights());
+    Airport.reinitializeUniqueCode(getAirports());
+    Plane.reinitializeAutouniqueID(getPlanes());
+    Person.reinitializeUniqueName(getPersons());
+  }
+}
+
+class Flight {
+  public static void reinitializeUniqueFlightNumber(List<Flight> flights) {
+    flightsByFlightNumber.clear();
+    for (var f : flights) {
+      flightsByFlightNumber.put(f.getFlightNumber(), f);
+    }
+  }
+}
+
+class Airport {
+  public static void reinitializeUniqueCode(List<Airport> airports) {
+    airportsByCode.clear();
+    for (var a : airports) {
+      airportsByCode.put(a.getCode(), a);
+    }
+  }
+}
+
+class Person {
+  public static void reinitializeUniqueName(List<Person> persons) {
+    personsByName.clear();
+    for (Person p : persons) {
+      personsByName.put(p.getName(), p);
+    }
+  }
+}
+
+class Plane {
+  public static void reinitializeAutouniqueID(List<Plane> planes) {
+    nextId = 0; 
+    for (Plane plane : planes) {
+      if (plane.getId() > nextId) {
+        nextId = plane.getId();
+      }
+    }
+    nextId++;
+  }
+}

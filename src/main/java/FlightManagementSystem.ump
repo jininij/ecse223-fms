@@ -1,6 +1,7 @@
 namespace ca.mcgill.ecse.flightmanagementsystem.model;
 
 use FlightStates.ump;
+use FMSPersistence.ump;
 
 class FMS {
 1 <@>- * Flight;
@@ -24,7 +25,7 @@ unique name;
 }
 
 class Plane {
-autounique planeId;
+autounique id;
 model;
 status;
 }

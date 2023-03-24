@@ -5,7 +5,8 @@ package ca.mcgill.ecse.flightmanagementsystem.model;
 import java.util.*;
 import java.sql.Date;
 
-// line 17 "../../../../../FlightManagementSystem.ump"
+// line 19 "../../../../../FMSPersistence.ump"
+// line 18 "../../../../../FlightManagementSystem.ump"
 public class Airport
 {
 
@@ -345,6 +346,14 @@ public class Airport
     {
       Flight aArrivingFlight = arrivingFlights.get(i - 1);
       aArrivingFlight.delete();
+    }
+  }
+
+  // line 21 "../../../../../FMSPersistence.ump"
+   public static  void reinitializeUniqueCode(List<Airport> airports){
+    airportsByCode.clear();
+    for (var a : airports) {
+      airportsByCode.put(a.getCode(), a);
     }
   }
 

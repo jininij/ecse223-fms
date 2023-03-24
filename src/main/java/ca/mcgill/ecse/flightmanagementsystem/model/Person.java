@@ -4,7 +4,8 @@
 package ca.mcgill.ecse.flightmanagementsystem.model;
 import java.util.*;
 
-// line 22 "../../../../../FlightManagementSystem.ump"
+// line 28 "../../../../../FMSPersistence.ump"
+// line 23 "../../../../../FlightManagementSystem.ump"
 public class Person
 {
 
@@ -195,6 +196,14 @@ public class Person
     if (workingFlight != null)
     {
       workingFlight.setPilot(null);
+    }
+  }
+
+  // line 30 "../../../../../FMSPersistence.ump"
+   public static  void reinitializeUniqueName(List<Person> persons){
+    personsByName.clear();
+    for (Person p : persons) {
+      personsByName.put(p.getName(), p);
     }
   }
 

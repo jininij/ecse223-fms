@@ -6,7 +6,8 @@ import java.util.*;
 import java.sql.Date;
 
 // line 1 "../../../../../FlightStates.ump"
-// line 12 "../../../../../FlightManagementSystem.ump"
+// line 10 "../../../../../FMSPersistence.ump"
+// line 13 "../../../../../FlightManagementSystem.ump"
 public class Flight
 {
 
@@ -622,6 +623,14 @@ public class Flight
   // line 83 "../../../../../FlightStates.ump"
    private void rejectCancel(String error){
     throw new RuntimeException(error);
+  }
+
+  // line 12 "../../../../../FMSPersistence.ump"
+   public static  void reinitializeUniqueFlightNumber(List<Flight> flights){
+    flightsByFlightNumber.clear();
+    for (var f : flights) {
+      flightsByFlightNumber.put(f.getFlightNumber(), f);
+    }
   }
 
 
